@@ -161,13 +161,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-.png
-.jpg
-.jpeg
-.gif
-.bmp
-.tiff
-.webp
-.svg
-.ico
-store/images/products/*
+# Ignore images in specific product folder
+multitenantEcomm/store/images/products/*
+!multitenantEcomm/store/images/products/.gitkeep
