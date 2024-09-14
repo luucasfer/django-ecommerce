@@ -15,7 +15,7 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Stock must be greater than zero.")
         return value
     def validate_name(self, value):
-        if value.isdigit():
+        if value.isalpha():
             raise serializers.ValidationError("Name cannot be all numbers.")
         return value
     def validate_picture(self, value):
