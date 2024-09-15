@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "django_extensions",
 
     #custom apps
-    "store",
+    "core",
+    "userauths",
 ]
 
 MIDDLEWARE = [
@@ -141,6 +142,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
+    "welcome_sign": "Seja bem vindo",
     'site_title': 'Nome Ecommerce',
     'site_header': 'Nome Ecommerce',
     'site_brand': 'Sua brand',
@@ -148,3 +150,7 @@ JAZZMIN_SETTINGS = {
     'copyright': 'develop by Lucas Ferreira',
     
 }
+
+
+# get the new user model that we created
+AUTH_USER_MODEL = 'userauths.User'
