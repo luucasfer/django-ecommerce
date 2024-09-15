@@ -5,7 +5,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from functions.logger import get_logger
 
-from .models import Product
+from .models import Picture, Product
 
 logger = get_logger("logs.log")
 
@@ -18,11 +18,30 @@ class ProductAdmin(admin.ModelAdmin):
     list_per_page = 50
 
     @receiver(post_delete, sender=Product)
-    def delete_product_image(sender, instance, **kwargs):
-        if instance.picture:
-            if os.path.isfile(instance.picture.path):
-                os.remove(instance.picture.path)
-                logger.info(f"The image '{instance.picture.name}' was deleted successfully.")
-            if os.listdir(f'store/images/products/{instance.name}/') == []:
-                os.rmdir(f'store/images/products/{instance.name}/')
-                logger.info(f"The folder '{instance.name}' was empty and deleted successfully.")
+    def delete_product_and_images(sender, instance, **kwargs):
+        # if the product has images, delete them all
+        if instance.images:
+            for image in instance.images.all():
+                if os.path.isfile(image.image.path):
+                    os.remove(image.image.path)
+                    logger.info(f"The product '{instance.name}' and all its images were deleted successfully.")
+                    
+
+@admin.register(Picture)
+class PictureAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product_id', 'image')
+    search_fields = ('product_id',)
+    list_filter = ('product_id',)
+    list_per_page = 50
+
+    @receiver(post_delete, sender=Picture)
+    def delete_images_from_product(sender, instance, **kwargs):
+        if instance.image:
+            #remove the image from the folder
+            if os.path.isfile(instance.image.path):
+                os.remove(instance.image.path)
+                logger.info(f"The image '{instance.image}' was deleted successfully.")
+            # remove the folder if it is empty
+            if os.listdir(f'store/images/products/{instance.product.name}/') == []:
+                os.rmdir(f'store/images/products/{instance.product.name}/')
+                logger.info(f"The folder '{instance.product.name}' was empty and deleted successfully.")
