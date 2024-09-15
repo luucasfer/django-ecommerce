@@ -42,6 +42,6 @@ class PictureAdmin(admin.ModelAdmin):
                 os.remove(instance.image.path)
                 logger.info(f"The image '{instance.image}' was deleted successfully.")
             # remove the folder if it is empty
-            if os.listdir(f'store/images/products/{instance.product.name}/') == []:
-                os.rmdir(f'store/images/products/{instance.product.name}/')
+            if os.listdir(f'media/products/{instance.product.name}/') == []:
+                os.rmdir(f'media/products/{instance.product.name}/')
                 logger.info(f"The folder '{instance.product.name}' was empty and deleted successfully.")

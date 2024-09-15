@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from .models import Product
+from django.http import HttpResponse
 
-def home(request):
+def index(request):
     products = Product.objects.all()
-    return render(request, 'store/pages/home.html', status=200, context=
+    return render(request, 'store/index.html', status=200, context=
         {
             'products': products
         }

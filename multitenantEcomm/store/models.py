@@ -27,12 +27,12 @@ class Product(models.Model):
 
 class Picture(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='store/images/products/', null=True, blank=True) #, validators=[validate_image])
+    image = models.ImageField(upload_to='products/', null=True, blank=True) #, validators=[validate_image])
 
     def __str__(self):
         return f"Image for {self.product.name}"
 
     def save(self, *args, **kwargs):
         # create a folder for each product to agregate the images
-        self.image.field.upload_to = f'store/images/products/{self.product.name}/'
+        self.image.field.upload_to = f'products/{self.product.name}/'
         super().save(*args, **kwargs)
