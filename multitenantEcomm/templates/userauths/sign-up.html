@@ -1,0 +1,77 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="main pages">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow"><i class="fi-rs-home mr-5"></i>Início</a>
+                    <span></span> Páginas <span></span> Minha Conta
+                </div>
+            </div>
+        </div>
+        <div class="page-content pt-150 pb-150">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-8">
+                                <div class="login_wrap widget-taber-content background-white">
+                                    <div class="padding_eight_all bg-white">
+
+                                        {% if form.errors %}:
+                                            <div class="alert alert-danger">
+                                                <strong>{{form.errors}}</strong>
+                                            </div>
+                                        {% endif %}
+                                        <div class="heading_s1">
+                                            <h1 class="mb-5">Criar uma Conta</h1>
+                                            <p class="mb-30">Já tem uma conta? <a href="page-login.html">Entrar</a></p>
+                                        </div>
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            {% comment %} utiliza o django.forms que estao no forms.py {% endcomment %}
+                                            <div class="form-group">
+                                                {{ form.username }} 
+                                            </div>
+                                            <div class="form-group">
+                                                {{ form.email }} 
+                                            </div>
+                                            <div class="form-group">
+                                                {{ form.password1 }} 
+                                            </div>
+                                            <div class="form-group">
+                                                {{ form.password2 }} 
+                                            </div>
+                                            <div class="form-group mb-30">
+                                                <button type="submit" class="btn btn-fill-out btn-block hover-up font-weight-bold" name="login">Enviar &amp; Registrar</button>
+                                            </div>
+                                            <p class="font-xs text-muted"><strong>Nota:</strong> Seus dados pessoais serão usados para apoiar sua experiência ao longo deste site, para gerenciar o acesso à sua conta e para outros fins descritos em nossa política de privacidade</p>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 pr-30 d-none d-lg-block">
+                                <div class="card-login mt-115">
+                                    <a href="#" class="social-login facebook-login">
+                                        <img src="{% static 'assets/imgs/theme/icons/logo-facebook.svg' %}" alt="" />
+                                        <span>Continuar com Facebook</span>
+                                    </a>
+                                    <a href="#" class="social-login google-login">
+                                        <img src="{% static 'assets/imgs/theme/icons/logo-google.svg' %}" alt="" />
+                                        <span>Continuar com Google</span>
+                                    </a>
+                                    <a href="#" class="social-login apple-login">
+                                        <img src="{% static 'assets/imgs/theme/icons/logo-apple.svg' %}" alt="" />
+                                        <span>Continuar com Apple</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock content %}
