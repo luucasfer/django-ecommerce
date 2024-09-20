@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 from userauths.forms import UserRegisterForm
+from userauths.models import User
 
-User = settings.AUTH_USER_MODEL
 
 def register_view(request):
 
@@ -25,7 +25,7 @@ def register_view(request):
             return redirect("core:index")  
     else:
         form = UserRegisterForm() 
-        messages.warning(request, "Não foi possivel registrar o usuario. Tente novamente.")
+        messages.warning(request, "Não foi possivel registrar o usuario")
  
     context = {
         'form': form
@@ -35,33 +35,30 @@ def register_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        messages.warning(request, "Voce já está autenticado.")
+        messages.warning(request, "Voce já está autenticado")
         return redirect("core:index") 
     
     if request.method == 'POST':
-        email_from_form = request.POST.get('email') or request.POST.get('username')
+        email_from_form = request.POST.get('email')
         password_from_form = request.POST.get('password') 
         
         try:
             user = User.objects.get(email=email_from_form)
+            user = authenticate(request, email=email_from_form, password=password_from_form)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "Bem-vindo!")
+                return redirect("core:index")
+            else:
+                messages.warning(request, f"Usuario não encontrado")
         except:
-            messages.warning(request, f"Erro ao tentar fazer login. Tente novamente.")
+            messages.warning(request, f"Erro ao tentar fazer login")
 
-        user = authenticate(request, email=email_from_form, password=password_from_form)
-        if user is not None:
-            login(request, user)
-            messages.success(request, "Bem-vindo!")
-            return redirect("core:index")
-        else:
-            messages.warning(request, f"Usuario não encontrado. Crie uma conta para continuar.")
-            return redirect("userauths:sign-up")
-        
-    context = {}
-    return render(request, "userauths/sign-in.html", context)
+    return render(request, "userauths/sign-in.html")
     
 
 def logout_view(request):
     logout(request)
-    messages.success(request, "Você foi desconectado com sucesso.")
+    messages.success(request, "Você foi desconectado")
     return redirect("userauths:sign-in")
 

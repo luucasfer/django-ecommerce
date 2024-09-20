@@ -26,7 +26,7 @@
                                         {% endif %}
                                         <div class="heading_s1">
                                             <h1 class="mb-5">Criar uma Conta</h1>
-                                            <p class="mb-30">Já tem uma conta? <a href="page-login.html">Entrar</a></p>
+                                            <p class="mb-30">Já tem uma conta? <a href={% url 'userauths:sign-in' %}>Entrar</a></p>
                                         </div>
                                         <form method="POST">
                                             {% csrf_token %}
