@@ -9,6 +9,10 @@ class User(AbstractUser):
     USERNAME_FIELD = "email" #login with email
     REQUIRED_FIELDS = ['username'] 
 
+    class Meta:
+        verbose_name_plural = 'Usuários'
+
     def __str__(self):
+
         return self.username
 

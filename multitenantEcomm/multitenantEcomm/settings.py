@@ -147,7 +147,7 @@ JAZZMIN_SETTINGS = {
     'site_header': 'Nome Ecommerce',
     'site_brand': 'Sua brand',
     'site_logo': 'assets/imgs/theme/loading.gif',
-    'copyright': 'develop by Lucas Ferreira',
+    'copyright': 'develop by @luucasfer',
     
 }
 

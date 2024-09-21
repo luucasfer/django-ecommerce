@@ -1,47 +1,77 @@
-#import os
-#
-#from django.contrib import admin
-#from django.db.models.signals import post_delete
-#from django.dispatch import receiver
-#from functions.logger import get_logger
-#
-#from .models import Picture, Product
-#
-#logger = get_logger("logs.log")
-#
-#@admin.register(Product)
-#class ProductAdmin(admin.ModelAdmin):
-#    list_display = ('id', 'name', 'description', 'price', 'stock')
-#    search_fields = ('name',)
-#    list_filter = ('name', 'price', 'stock')
-#    list_editable = ('price', 'stock', 'description', 'name')
-#    list_per_page = 50
-#
-#    @receiver(post_delete, sender=Product)
-#    def delete_product_and_images(sender, instance, **kwargs):
-#        # if the product has images, delete them all
-#        if instance.images:
-#            for image in instance.images.all():
-#                if os.path.isfile(image.image.path):
-#                    os.remove(image.image.path)
-#                    logger.info(f"The product '{instance.name}' and all its images were deleted successfully.")
-#                    
-#
-#@admin.register(Picture)
-#class PictureAdmin(admin.ModelAdmin):
-#    list_display = ('id', 'product_id', 'image')
-#    search_fields = ('product_id',)
-#    list_filter = ('product_id',)
-#    list_per_page = 50
-#
-#    @receiver(post_delete, sender=Picture)
-#    def delete_images_from_product(sender, instance, **kwargs):
-#        if instance.image:
-#            #remove the image from the folder
-#            if os.path.isfile(instance.image.path):
-#                os.remove(instance.image.path)
-#                logger.info(f"The image '{instance.image}' was deleted successfully.")
-#            # remove the folder if it is empty
-#            if os.listdir(f'media/products/{instance.product.name}/') == []:
-#                os.rmdir(f'media/products/{instance.product.name}/')
-#                logger.info(f"The folder '{instance.product.name}' was empty and deleted successfully.")
+import os
+import shutil
+
+from core.models import (Address, CartOrder, CartOrderItem, Category, Product,
+                         ProductImages, ProductReview, Tags, Wishlist)
+from django.contrib import admin
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+
+
+class ProductImagesAdmin(admin.TabularInline): 
+    model = ProductImages
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    inlines = [ProductImagesAdmin]
+    list_display = ('product_id', 'title', 'description', 'category', 'actual_price', 'old_price', 'stock_amount', 'in_stock', 'status', 'specifications', 'product_status', 'rating', 'created_at') #, 'display_product_images')
+    list_display_links = ('product_id', 'title')
+
+    #def display_product_images(self, obj):
+    #    images = obj.images.all()
+    #    if images:
+    #        return mark_safe(''.join([f'<img src="{image.image.url}" width="50" height="50" />' for image in images]))
+    #    return "No images available"
+    #display_product_images.short_description = 'Product Images'
+
+    @receiver(post_delete, sender=ProductImages)
+    def delete_product_and_images(sender, instance, **kwargs):
+        # if the product was deleted, delete the folder with the images
+        if os.path.isdir(f'media/products/{instance.product_id}/'):
+            shutil.rmtree(f'media/products/{instance.product_id}/')
+
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('category_id', 'title', 'category_image', 'created_at')
+    list_display_links = ('category_id', 'title')
+
+    @receiver(post_delete, sender=Category)
+    def delete_category_and_images(sender, instance, **kwargs):
+        # if the category was deleted, delete the folder with the images
+        if os.path.isdir(f'media/categories/{instance.category_id}/'):
+            shutil.rmtree(f'media/categories/{instance.category_id}/')
+
+
+
+@admin.register(CartOrder)
+class CartOrderAdmin(admin.ModelAdmin):
+    list_display = ('user', 'order_price', 'paid_status', 'order_date', 'due_date', 'order_status', 'created_at')
+    list_display_links = ('user', 'order_price')
+
+
+@admin.register(CartOrderItem)
+class CartOrderItemAdmin(admin.ModelAdmin):
+    list_display = ('order', 'invoice_number', 'product', 'product_status', 'item', 'image', 'quantity', 'price', 'total', 'created_at')
+    list_display_links = ('order', 'invoice_number')
+
+
+@admin.register(ProductReview)
+class ProductReviewAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'rating', 'review', 'created_at')
+    list_display_links = ('user', 'product')
+
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'created_at')
+    list_display_links = ('user', 'product')
+
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('user', 'full_name', 'phone', 'address', 'status')
+    list_display_links = ('user', 'full_name')
+
