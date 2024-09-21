@@ -12,10 +12,8 @@ STATUS_CHOICES = (
 )
 
 STATUS = (
-    ("rascunho", "Rascunho"),
     ("desabilitado", "Desabilitado"),
-    ("rejeitado", "Rejeitado"),
-    ("em_analise", "Em analise"),
+    ("em analise", "Em analise"),
     ("publicado", "Publicado")
 )
 
@@ -61,7 +59,7 @@ class Category(models.Model):
 
     def category_image(self):
         if self.image:
-            return mark_safe(f'<img src="{self.image}" width="50" height="50" />')
+            return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
         return "No image available"
 
 
@@ -78,9 +76,8 @@ class Product(models.Model):
     product_id = ShortUUIDField(unique=True, primary_key=True, length=10, max_length=20, prefix="prod", alphabet="abcdefghijklmnopqrstuvwxyz1234567890")
     sku = ShortUUIDField(unique=True, length=4, max_length=10, prefix="sku", alphabet="1234567890")
     title = models.CharField(max_length=100)
-    #image = models.ImageField(upload_to=product_directory_path) #, validators=[validate_image])
     description = models.TextField(max_length=1000, null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True) # if category is deleted, set the product category to NULL
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='category') # if category is deleted, set the product category to NULL
     actual_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     old_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], null=True, blank=True)
     stock_amount = models.IntegerField(validators=[MinValueValidator(0)], default=1)
@@ -88,7 +85,7 @@ class Product(models.Model):
     status = models.BooleanField(default=True)
     specifications = models.TextField(max_length=1000, null=True, blank=True)
     #tags = models.ForeignKey(Tags, on_delete=models.SET_NULL, null=True)
-    product_status = models.CharField(max_length=20, choices=STATUS, default="rascunho")
+    product_status = models.CharField(max_length=20, choices=STATUS, default="publicado")
     rating = models.IntegerField(choices=RATING, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -99,7 +96,7 @@ class Product(models.Model):
 
     def product_image(self):
         if self.image:
-            return mark_safe(f'<img src="{self.image}" width="50" height="50" />')
+            return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
         return "No image available"
 
     def __str__(self):
@@ -201,6 +198,7 @@ class Wishlist(models.Model):
         return self.product.title
 
     
+
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

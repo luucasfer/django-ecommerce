@@ -6,6 +6,7 @@ from core.models import (Address, CartOrder, CartOrderItem, Category, Product,
 from django.contrib import admin
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils.html import mark_safe
 
 
 class ProductImagesAdmin(admin.TabularInline): 
@@ -15,19 +16,21 @@ class ProductImagesAdmin(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductImagesAdmin]
-    list_display = ('product_id', 'title', 'description', 'category', 'actual_price', 'old_price', 'stock_amount', 'in_stock', 'status', 'specifications', 'product_status', 'rating', 'created_at') #, 'display_product_images')
+    list_display = ('product_id',  'title', 'display_product_images', 'description', 'category', 'actual_price', 'old_price', 'stock_amount', 'product_status', 'created_at')
     list_display_links = ('product_id', 'title')
+    list_editable = ('actual_price', 'old_price', 'stock_amount', 'product_status',)
+    search_fields = ('title', 'product_id')
 
-    #def display_product_images(self, obj):
-    #    images = obj.images.all()
-    #    if images:
-    #        return mark_safe(''.join([f'<img src="{image.image.url}" width="50" height="50" />' for image in images]))
-    #    return "No images available"
-    #display_product_images.short_description = 'Product Images'
+    def display_product_images(self, obj):
+        images = obj.images.all()
+        if images:
+            return mark_safe(''.join([f'<img src="{image.image.url}" width="50" height="50" style="margin: 2px;" />' for image in images]))
+        return "No images available"
+    display_product_images.short_description = 'Product Images'
 
+    # if the product was deleted, delete the folder with the images
     @receiver(post_delete, sender=ProductImages)
     def delete_product_and_images(sender, instance, **kwargs):
-        # if the product was deleted, delete the folder with the images
         if os.path.isdir(f'media/products/{instance.product_id}/'):
             shutil.rmtree(f'media/products/{instance.product_id}/')
 
@@ -38,9 +41,9 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ('category_id', 'title', 'category_image', 'created_at')
     list_display_links = ('category_id', 'title')
 
+    # if the category was deleted, delete the folder with the images
     @receiver(post_delete, sender=Category)
     def delete_category_and_images(sender, instance, **kwargs):
-        # if the category was deleted, delete the folder with the images
         if os.path.isdir(f'media/categories/{instance.category_id}/'):
             shutil.rmtree(f'media/categories/{instance.category_id}/')
 
