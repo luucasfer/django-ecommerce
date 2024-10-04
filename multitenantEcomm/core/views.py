@@ -43,3 +43,21 @@ def category_product_list_view(request, category_id):
         'categories': categories
     }
     return render(request, 'core/category-product-list.html', status=200, context=context)
+
+
+def product_detail_view(request, product_id):
+    product = Product.objects.get(product_id=product_id)
+    product_images = product.images.all()
+    reviews = ProductReview.objects.filter(product=product)
+    products = Product.objects.filter(product_status='publicado').order_by('-rating')
+    categories = Category.objects.all()
+    context = {
+        'product': product,
+        'product_image': product_images,
+        'reviews': reviews,
+        'products': products,
+        'categories': categories,
+    }
+    return render(request, 'core/product-detail.html', status=200, context=context)
+
+

@@ -87,6 +87,7 @@ class Product(models.Model):
     #tags = models.ForeignKey(Tags, on_delete=models.SET_NULL, null=True)
     product_status = models.CharField(max_length=20, choices=STATUS, default="publicado")
     rating = models.IntegerField(choices=RATING, default=0)
+    sold_quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 

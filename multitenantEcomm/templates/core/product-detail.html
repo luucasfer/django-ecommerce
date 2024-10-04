@@ -1,0 +1,400 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+<script>hljs.initHighlightingOnLoad();</script>
+<script src="cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+<script src="{% static 'assets/js/prism.js' %}"></script>
+<link rel="stylesheet" href="{% static 'assets/css/prism.css' %}">
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>Inicio</a>
+                    <span></span> <a href="{% url 'core:category-product-list' product.category.category_id %}">{{ product.category.name }}</a> <span></span> {{ product.title }}
+                </div>
+            </div>
+        </div>
+        <div class="container mb-30">
+            <div class="row">
+                <div class="col-xl-11 col-lg-12 m-auto">
+                    <div class="row">
+                        <div class="col-xl-9">
+                            <div class="product-detail accordion-detail">
+                                <div class="row mb-50 mt-30">
+                                    <div class="col-md-6 col-sm-12 col-xs-12 mb-md-0 mb-sm-5">
+                                        <div class="detail-gallery">
+                                            <span class="zoom-icon"><i class="fi-rs-search"></i></span>
+                                            <!-- MAIN SLIDES -->
+                                            <div class="product-image-slider">
+                                                <figure class="border-radius-10">
+                                                    <img src="{{ product.image.url }}" alt="product image" />
+                                                </figure>
+                                                {% for image in product_image %}
+                                                <figure class="border-radius-10">
+                                                    <img src="{{ image.image.url }}" alt="product image" />
+                                                </figure>
+                                               {% endfor %}
+                                            </div>
+                                            <!-- THUMBNAILS -->
+                                            <div class="slider-nav-thumbnails">
+                                                <div><img src="{{ product.image.url }}" alt="product image" /></div>
+                                                {% for image in product_image %}
+                                                <div><img src="{{ image.image.url }}" alt="product image" /></div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <!-- End Gallery -->
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xs-12">
+                                        <div class="detail-info pr-30 pl-30">
+                                            {% if product.old_price %}
+                                            <span class="stock-status out-stock"> -{{ product.get_percentage_discount }}% </span>
+                                            {% endif %}
+                                            <h2 class="title-detail">{{ product.title }}</h2>
+                                            <div class="product-detail-rating">
+                                                <div class="product-rate-cover text-end">
+                                                    <div class="product-rate d-inline-block">
+                                                        <div class="product-rating" style="width: 90%"></div>
+                                                    </div>
+                                                    <span class="font-small ml-5 text-muted"> ({{ reviews.count }} Avaliações)</span>
+                                                </div>
+                                            </div>
+                                            <div class="clearfix product-price-cover">
+                                                <div class="product-price primary-color float-left">
+                                                    {% if product.old_price %}
+                                                    <span class="current-price text-brand">R$</span><span class="current-price text-brand current-price current-product-price-{{ product.product_id }}" id="current-product-price">{{ product.actual_price }}</span>
+                                                    <span>
+                                                        <span class="save-price font-md color3 ml-15">-{{ product.get_percentage_discount }}% Off</span>
+                                                        <span class="old-price font-md ml-15">R${{ product.old_price }}</span>
+                                                    </span>
+                                                    {% else %}
+                                                    <span class="current-price text-brand">R$</span><span class="current-price text-brand current-price current-product-price-{{ product.product_id }}" id="current-product-price">{{ product.actual_price }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="short-desc mb-30">
+                                                <p class="font-lg">{{ product.description|safe|truncatechars:150 }}</p>
+                                            </div>
+                                            
+                                            <div class="detail-extralink mb-50">
+                                                    <br>
+                                                    <input type="number" value="1" name="" id="product-quantity" class="w-25 mb-10 product-quantity-{{ product.product_id }}">
+                                                    <br>
+                                                <div class="product-extra-link2">
+                                                    
+                                                        <input type="hidden" class="product-pid-{{ product.product_id }}" value="{{ product.product_id }}">
+                                                        <input type="hidden" class="product-image-{{ product.product_id }}" value="{{ product.image.url }}">
+                                                        <input type="hidden" class="product-id-{{ product.product_id }}" value="{{ product.product_id }}">
+                                                        <input type="hidden" class="product-title-{{ product.product_id }}" value="{{ product.title }}">
+
+                                                    <button type="submit" class="button button-add-to-cart add-to-cart-btn" data-index="{{ product.product_id }}" id="add-to-cart-btn"><i class="fi-rs-shopping-cart"></i>Add to cart</button>
+                                                    <a aria-label="Lista de desejos" class="action-btn hover-up add-to-wishlist" data-product-item="{{ product.product_id }}"><i class="fi-rs-heart"></i></a>
+                                                    <a aria-label="Comparar" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="font-xs">
+                                                <ul class="float-start">
+                                                    {% if product.tags %}
+                                                    <li class="mb-5">Tags: {% for tag in product.tags.all %}<a href="{% url 'core:tags' tag.slug %}" rel="tag"> #{{tag.name}}</a>,{% endfor %} </li>
+                                                    {% endif %}
+                                                    <li>Ainda Restam:<span class="in-stock text-brand ml-5">{{ product.stock_amount }} unidade{{ product.stock_amount|pluralize }}</span></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- Detail Info -->
+                                    </div>
+                                </div>
+                                <div class="product-info">
+                                    <div class="tab-style3">
+                                        <ul class="nav nav-tabs text-uppercase">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" id="Description-tab" data-bs-toggle="tab" href="#Description">Descrição</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="Reviews-tab" data-bs-toggle="tab" href="#Reviews">Avaliações ({{ reviews.count }})</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content shop_info_tab entry-main-content">
+                                            <div class="tab-pane fade show active" id="Description">
+                                                <div class="">
+                                                    <p>
+                                                        {{ product.description|safe }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="Reviews">
+                                                <!--Comments-->
+                                                <div class="comments-area">
+                                                    <div class="row">
+                                                        <div class="col-lg-8">
+                                                            <h4 class="mb-30">Perguntas e Respostas</h4>
+                                                            <div class="comment-list">
+                                                                {% for r in reviews %}
+                                                                <div class="single-comment justify-content-between d-flex mb-30">
+                                                                    <div class="user justify-content-between d-flex">
+                                                                        <div class="thumb text-center">
+                                                                            <img src="{{ r.user.profile.image.url }}" style="width: 100px; height: 100px; object-fit: cover;" alt="" />
+                                                                            <a href="#" class="font-heading text-brand">{{r.user.username|title}}</a>
+                                                                        </div>
+
+                                                                        <div class="desc">
+                                                                            <div class="d-flex justify-content-between mb-10">
+                                                                                <div class="d-flex align-items-center">
+                                                                                    <span class="font-xs text-muted">{{r.date|date:"d M, Y"}} </span>
+                                                                                </div>
+                                                                                <div>
+                                                                                    {% for star in r.rating|ljust:r.rating %}
+                                                                                     <i class="fas fa-star text-warning"></i>
+                                                                                    {% endfor %}
+                                                                                </div>
+                                                                            </div>
+                                                                            <p class="mb-10">{{ r.review}}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <h4 class="mb-30">Avaliações do Cliente</h4>
+                                                            <div class="d-fdlex mb-30">
+                                                                <!-- <div class="product-rate d-inline-block mr-15"> -->
+                                                                    <!-- <div class="product-rating" style="width: 90%"></div> -->
+                                                                <!-- </div> -->
+                                                                <!-- <div >
+                                                                    <p">★☆★☆★☆</p>
+                                                                </div>
+                                                                <br> -->
+                                                                <h6>{{ average_rating.rating|floatformat:1 }} de 5.0</h6>
+                                                            </div>
+                                                            <div class="progress">
+                                                                <span>5 star</span>
+                                                                <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                            </div>
+                                                            <div class="progress">
+                                                                <span>4 star</span>
+                                                                <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                                            </div>
+                                                            <div class="progress">
+                                                                <span>3 star</span>
+                                                                <div class="progress-bar" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">45%</div>
+                                                            </div>
+                                                            <div class="progress">
+                                                                <span>2 star</span>
+                                                                <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+                                                            </div>
+                                                            <div class="progress mb-30">
+                                                                <span>1 star</span>
+                                                                <div class="progress-bar" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                                                            </div>
+                                                            <a href="#" class="font-xs text-muted">Como são calculadas as avaliações?</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--comment form-->
+                                                {% if request.user.is_authenticated %}
+                                                {% if make_review %}
+                                                    <div class="comment-form">
+                                                        <h4 class="mb-15 add-review">Adicionar uma avaliação</h4>
+                                                        <strong class="text-success" id="review-res"> </strong>
+                                                        <!-- <div class="product-rate d-inline-block mb-30"></div> -->
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-12">
+                                                                <form class="form-contact comment_form hide-comment-form" action="{% url 'core:ajax-add-review' p.id %}" id="commentForm" method="POST">
+                                                                    {% csrf_token %}
+                                                                    <div class="row">
+                                                                        <div class="col-12">
+                                                                            <div class="form-group">
+                                                                                {{review_form.review}}
+                                                                                <!-- <textarea class="form-control w-100" name="comment" id="comment" cols="30" rows="9" placeholder="Write Comment"></textarea> -->
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="col-12">
+                                                                            <div class="form-group">
+                                                                                {{review_form.rating}}
+                                                                                <!-- <textarea class="form-control w-100" name="comment" id="comment" cols="30" rows="9" placeholder="Write Comment"></textarea> -->
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- <div class="col-sm-6">
+                                                                            <div class="form-group">
+                                                                                <input class="form-control" name="name" id="name" type="text" placeholder="Name" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="form-group">
+                                                                                <input class="form-control" name="email" id="email" type="email" placeholder="Email" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <div class="form-group">
+                                                                                <input class="form-control" name="website" id="website" type="text" placeholder="Website" />
+                                                                            </div>
+                                                                        </div> -->
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <button type="submit" class="button button-contactForm">Enviar Avaliação</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-60">
+                                    {% if products %}
+                                    <div class="col-12">
+                                        <h2 class="section-title style-1 mb-30">Produtos Relacionados</h2>
+                                    </div>
+                                    {% endif %}
+                                    <div class="col-12">
+                                        <div class="row related-products">
+                                            {% for p in products %}
+                                            <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                                <div class="product-cart-wrap mb-30">
+                                                    <div class="product-img-action-wrap">
+                                                        <div class="product-img product-img-zoom">
+                                                            <a href="{% url 'core:product-detail' p.product_id %}">
+                                                                <img class="default-img" src="{{ p.image.url }}" alt="" style="height: 280px; width: 280px; object-fit: cover;"   />
+                                                                <img class="hover-img" src="{{ p.image.url }}" alt=""  style="height: 280px; width: 280px; object-fit: cover;"  />
+
+                                                            </a>
+                                                        </div>
+                                                        <div class="product-action-1">
+                                                            <a aria-label="Add To Wishlist"  class="action-btn add-to-wishlist" data-product-item="{{p.product_id}}"><i class="fi-rs-heart"></i></a>
+                                                            <!-- <a aria-label="Compare" class="action-btn" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
+                                                            <a href="{% url 'core:product-detail' p.product_id %}" class="action-btn"><i class="fi-rs-eye"></i></a>
+                                                        </div>
+                                                        <div class="product-badges product-badges-position product-badges-mrg">
+                                                            {% if p.old_price %}
+                                                            <span class="hot">-{{p.get_percentage_discount}}%</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="product-content-wrap">
+                                                        <div class="product-category">
+                                                            <a href="{% url 'core:category-product-list' p.category.category_id %}">{{ p.category.title }}</a>
+                                                        </div>
+                                                        <h2><a href="{% url 'core:product-detail' p.product_id %}">{{ p.title|truncatechars:50 }}</a></h2>
+                                                        <div class="product-rate-cover">
+                                                            <i class="fas fa-star text-warning"></i>
+                                                            <span class="font-small ml-5 text-muted"> ({{ p.reviews.count }})</span>
+
+                                                        </div>
+                                                        <div class="product-card-bottom">
+                                                            {% if p.old_price %}
+                                                            <div class="product-price">
+                                                                <span>R$</span> <span class="current-product-price-{{ p.product_id }}">{{p.actual_price}}</span>
+                                                                <span class="old-price">R${{p.old_price}}</span>
+                                                            </div>
+                                                            {% else %}
+                                                            <div class="product-price">
+                                                                <span>R$</span> <span class="current-product-price-{{ p.product_id }}">{{p.actual_price}}</span>
+                                                            </div>
+                                                            {% endif %}
+                                                            <div class="add-cart">
+                                                                <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ p.product_id }}">
+                                                                <input type="hidden" class="product-pid-{{ p.product_id }}" value="{{ p.product_id }}">
+                                                                <input type="hidden" class="product-image-{{ p.product_id }}" value="{{ p.image.url }}">
+                                                                <input type="hidden" class="product-id-{{ p.product_id }}" value="{{ p.product_id }}">
+                                                                <input type="hidden" class="product-title-{{ p.product_id }}" value="{{ p.title }}">
+                                                                <div class="d-flex">
+                                                                    <button class="add add-to-cart-btn" data-index="{{ p.product_id }}" style="border: none;" id="add-to-cart-btn"><i class="fi-rs-shopping-cart mr-5"></i>Add</button>
+                                                                    <button style="border: none; background: none;" class="add-to-wishlist" data-product-item="{{p.product_id}}"><i class="fi-rs-heart" style="fill: aqua;"></i></button>
+                                                                </div>
+                                                                <!-- <button class="add add-to-cart-btn" data-index="{{ p.id }}" style="border: none;" id="add-to-cart-btn"><i class="fi-rs-shopping-cart mr-5"></i>Add</button> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 primary-sidebar sticky-sidebar mt-30">
+                            <div class="sidebar-widget widget-delivery mb-30 bg-grey-9 box-shadow-none">
+                                <h5 class="section-title style-3 mb-20">Devolução e Garantia</h5>
+                                <ul>
+                                    <li>
+                                        <i class="fi fi-rs-shield-check mr-10 text-brand"></i>
+                                        <span> 100% Autêntico </span>
+                                    </li>
+                                    <li>
+                                        <i class="fi fi-rs-time-forward-ten mr-10 text-brand"></i>
+                                        <span> 7 Dias para Devolução </span>
+                                    </li>
+                                    <li>
+                                        <i class="fi fi-rs-diploma mr-10 text-brand"></i>
+                                        <span> 1 Ano de Garantia </span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="sidebar-widget widget-category-2 mb-30">
+                                <h5 class="section-title style-1 mb-30">Categorias</h5>
+                                <ul>
+                                    {% for c in categories %}
+                                    <li>
+                                        <a href="{% url 'core:category-product-list' c.category_id %}"> <img src="{{ c.image.url }}" alt="" />{{ c.title }}</a><span class="count">30</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <!-- Fillter By Price -->
+                            {% comment %} <div class="sidebar-widget price_range range mb-30">
+                                <h5 class="section-title style-1 mb-30">Filtrar por preço</h5>
+                                <div class="price-filter">
+                                    <div class="price-filter-inner">
+                                        <div id="slider-range" class="mb-20"></div>
+                                        <div class="d-flex justify-content-between">
+                                            <div class="caption">Min: <strong id="slider-range-value1" class="text-brand"></strong></div>
+                                            <div class="caption">Max: <strong id="slider-range-value2" class="text-brand"></strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group">
+                                    <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> Filtrar</a>
+                                </div>
+                            <!-- Product sidebar Widget -->
+                            <div class="sidebar-widget product-sidebar mb-30 p-30 bg-grey border-radius-10">
+                                <h5 class="section-title style-1 mb-30">Novos Produtos</h5>
+                                {% for p in products %}
+                                <div class="single-post clearfix">
+                                    <div class="image">
+                                        <img src="{{ p.image.url }}" alt="#" />
+                                    </div>
+                                    <div class="content pt-10">
+                                        <h5><a href="{% url 'core:product-detail' p.product_id %}">{{ p.title }}</a></h5>
+                                        <p class="price mb-0 mt-5">{{ p.price }}</p>
+                                        <div class="product-rate">
+                                            <div class="product-rating" style="width: 90%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div> {% endcomment %}
+                            {% comment %} <div class="banner-img wow fadeIn mb-lg-0 animated d-lg-block d-none">
+                                <img src="{% static 'assets/imgs/banner/banner-11.png' %}" alt="" />
+                                <div class="banner-text">
+                                    <span>Oganic</span>
+                                    <h4>
+                                        Save 17% <br /> on <span class="text-brand">Oganic</span><br /> Juice
+                                    </h4>
+                                </div>
+                            </div> {% endcomment %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock content %}

@@ -185,12 +185,12 @@
                                                 <div class="product-category">
                                                     <a href="shop-grid-right.html">{{ product.category }}</a>
                                                 </div>
-                                                <h2><a href="shop-product-right.html">{{ product.title }}</a></h2>
+                                                <h2><a href="shop-product-right.html">{{ product.title|truncatechars:50 }}</a></h2>
                                                 <div class="product-rate-cover">
                                                     <div class="product-rate d-inline-block">
-                                                        <div class="product-rating" style="width: 90%"></div>
+                                                        <div class="product-rating" style="width: {{ product.rating|floatformat:1 }}%"></div>
                                                     </div>
-                                                    <span class="font-small ml-5 text-muted"> ({{ product.rating }})</span>
+                                                    <span class="font-small ml-5 text-muted"> ({{ product.rating|floatformat:1 }})</span>
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
